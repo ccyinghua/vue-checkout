@@ -25,15 +25,160 @@
 	            </symbol>
 	        </defs>
 	    </svg>
-		
-		我是cart	
+		<!-- 内容 -->
+	    <div class="container">
+	        <div class="cart">
+	            <div class="checkout-title">
+	                <span>购物车</span>
+	            </div>
+	            <!-- table -->
+	            <div class="item-list-wrap">
+	                <div class="cart-item">
+	                    <div class="cart-item-head">
+	                        <ul>
+	                            <li>商品信息</li>
+	                            <li>商品金额</li>
+	                            <li>商品数量</li>
+	                            <li>总金额</li>
+	                            <li>编辑</li>
+	                        </ul>
+	                    </div>
+	                    <ul class="cart-item-list">
+	                        <li v-for="(item,index) in productList">
+	                            <div class="cart-tab-1">
+	                                <!-- 单选 -->
+	                                <div class="cart-item-check">
+	                                    <a href="javascipt:;" class="item-check-btn" v-bind:class="{'check':item.checked}" @click="selectedProduct(item)">
+	                                        <svg class="icon icon-ok"><use xlink:href="#icon-ok"></use></svg>
+	                                    </a>
+	                                </div>
+	                                <!-- 商品图片 -->
+	                                <div class="cart-item-pic">
+	                                    <img  v-bind:src="item.productImage" alt="烟"/>
+	                                </div>
+	                                <!-- 商品名称 -->
+	                                <div class="cart-item-title">
+	                                    <div class="item-name">{{item.productName+"=="+index}}</div>
+	                                </div>
+	                                <!-- 赠品 -->
+	                                <div class="item-include">
+	                                    <dl>
+	                                        <dt>赠送:</dt>
+	                                        <dd v-for="part in item.parts" v-text="part.partsName">打火机</dd>
+	                                    </dl>
+	                                </div>
+	                            </div>
+	                            <!-- 单价 -->
+	                            <div class="cart-tab-2">
+	                                <div class="item-price">{{item.productPrice | formatMoney}}</div>
+	                            </div>
+	                            <div class="cart-tab-3">
+	                                <div class="item-quantity">
+	                                    <div class="select-self select-self-open">
+	                                        <div class="quentity">
+	                                            <a href="javascript:;" v-on:click="changeMoney(item,-1)">-</a>
+	                                            <input type="text" disabled value="1" v-model="item.productQuentity">
+	                                            <a href="javascript:;" @click="changeMoney(item,1)">+</a>
+	                                        </div>
+	                                    </div>
+	                                    <div class="item-stock">有货</div>
+	                                </div>
+	                            </div>
+	                            <div class="cart-tab-4">
+	                                <!-- 总金额 -->
+	                                <div class="item-price-total">{{item.productPrice*item.productQuentity}}</div>
+	                            </div>
+	                            <!-- 删除功能 -->
+	                            <div class="cart-tab-5">
+	                                <div class="cart-item-opration">
+	                                    <a href="javascript:;" class="item-edit-btn" @click="delConfirm(item)">
+	                                        <svg class="icon icon-del"><use xlink:href="#icon-del"></use></svg>
+	                                    </a>
+	                                </div>
+	                            </div>
+	                        </li>
+	                    </ul>
+	                </div>
+	            </div>
+	            <!-- footer -->
+	            <!-- <div class="cart-foot-wrap">
+	                <div class="cart-foot-l">
+	                    <div class="item-all-check">
+	                        <a href="javascipt:;">
+	                            <span class="item-check-btn" v-bind:class="{'check':checkAllFlag}" @click="checkAll(true)">
+	                                <svg class="icon icon-ok"><use xlink:href="#icon-ok"></use></svg>
+	                            </span>
+	                            <span>全选</span>
+	                        </a>
+	                    </div>
+	                    <div class="item-all-del">
+	                        <a href="javascipt:;" class="item-del-btn" @click="checkAll(false)">
+	                            取消全选
+	                        </a>
+	                    </div>
+	                </div>
+	                <div class="cart-foot-r">
+	                    <div class="item-total">
+	                        Item total: <span class="total-price">{{totalMoney | money("元")}}</span>
+	                    </div>
+	                    <div class="next-btn-wrap">
+	                        <a href="address.html" class="btn btn--red">结账</a>
+	                    </div>
+	                </div>
+	            </div> -->
+	        </div>
+	    </div>
+
+	    <!-- <div class="md-modal modal-msg md-modal-transition" id="showModal" v-bind:class="{'md-show':delFlag}">
+	        <div class="md-modal-inner">
+	            <div class="md-top">
+	                <button class="md-close" @click="delFlag=false">关闭</button>
+	            </div>
+	            <div class="md-content">
+	                <div class="confirm-tips">
+	                    <p id="cusLanInfo">你确认删除此订单信息吗?</p>
+	                </div>
+	                <div class="btn-wrap col-2">
+	                    <button class="btn btn--m" id="btnModalConfirm" @click="delProduct()">Yes</button>
+	                    <button class="btn btn--m btn--red" id="btnModalCancel" @click="delFlag=false">No</button>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	    <div class="md-overlay" id="showOverLay" v-if="delFlag" @click="delFlag=false"></div>	 -->
 	</div>
 </template>
 <script type="text/ecmascript-6">
 export default{
+    data() {
+    	return {
+        	productList:[]  // 产品数组
+    	}
+    },
+    filters:{
+        formatMoney:function(value){
+            return "￥ "+value.toFixed(2);
+        }
+    },
+    mounted:function(){   //vue1.0的ready:function(){}
+        this.$nextTick(function(){
+            this.cartView();
+        });
+    },
+    methods:{
+    	cartView() {   // vue-resource插件获取json产品数据
+    		this.$http.get('http://localhost:8080/src/data/cart.json', {"id":123}).then((res) => {
+    			this.productList = res.body.result.productList;
+    			console.log(this.productList)
+    		});
+    	}
+    }	
 }
 </script>
-
 <style scoped>   
-    
+.quentity input{
+    width: 40px;
+    padding: 5px 10px;
+    text-align: center;
+}   
 </style>
