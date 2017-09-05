@@ -38,7 +38,7 @@ npm run dev
 ```
 >  vue-router 路由配置
 
-```
+```javascript
 main.js
 
 import VueRouter from 'vue-router'
@@ -67,7 +67,7 @@ new Vue({
 
 ```
 
-```
+```javascript
 App.vue
 
 <router-view></router-view>
@@ -84,22 +84,7 @@ coponents: {
 ```
 >  vue-resource获取json数组
 
-    - > resource插件返回的不是直接的数据  
-    - > >cartView:function(){
-            var _this = this;   //在vue实例里面，所有的this都指向是vm的实例，但是在某个函数作用域内部，他的作用域已经发生了变化，所有不能直接使用this
-            this.$http.get("data/cart.json",{"id":123}).then(function( res ){       //vue-resource插件获取json数据
-                _this.productList = res.body.result.productList;
-            });
-        }
-        cartView:function(){
-            this.$http.get("data/cart.json",{"id":123}).then(res=>{//ES6的写法，作用域已经指向了外层，this可以直接用了，不再是函数方法内部的this
-                this.productList = res.body.result.productList;
-            });
-        }
-
-
-
-```
+```javascript
 说明：
 -> resource插件返回的不是直接的数据  
 -> cartView:function(){     // ES5
