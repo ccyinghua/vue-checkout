@@ -82,6 +82,7 @@ coponents: {
 }
 
 ```
+- ### cart.vue 购物车
 >  vue-resource获取json数组
 
 ```javascript
@@ -127,10 +128,128 @@ methods:{
 
 ```
 
+>  选中商品
 
+<html>
+<!--在这里插入内容-->
+<p style="font-size:13px;"># json里面没有checked这个属性,所以set方法添加</p>
+<p style="font-size:13px;"># <span style="color:#E45944;">this.$set</span>(局部)/<span style="color:#E45944;">Vue.set</span>(全局) 注册值 添加属性</p>
+</html>
 
+```javascript
+selectedProduct:function(item){       
+   if(typeof item.checked == "undefined"){
+      //Vue.set(item,'checked',true);     // Vue.set也可以，但是本页面要import Vue...添加属性
+        this.$set(item,'checked',true);   //局部
+   }else{
+       item.checked = !item.checked;
+   }
+   this.calcTotalPrice();
+}
 
+```
+>  过滤器
 
+```javascript
+# 对金额格式化
+//局部
+<div class="item-price">{{item.productPrice | formatMoney}}</div>
+
+filters:{
+   formatMoney:function(value){
+        return "￥ "+value.toFixed(2);  //两位小数
+   }
+}
+
+//全局
+Item total: <span class="total-price">{{totalMoney | money("元")}}</span>
+
+import Vue from 'vue'
+Vue.filter('money',function(value,type){
+    return "￥ "+value.toFixed(2)+type;
+})
+
+```
+- ### address.vue 地址选择页面
+>  v-if
+
+```html
+> v-if 判断
+> item的isDefault属性为 true 时，显示"默认地址"
+> item的isDefault属性为 false 时，显示"设为默认"
+
+<div class="addr-opration addr-default" v-if="item.isDefault">默认地址</div>
+
+<div class="addr-opration addr-set-default" v-if="!item.isDefault">
+     <a href="javascript:;" class="addr-set-default-btn" @click="setDefault(item.addressId)"><i>设为默认</i></a>
+</div>
+
+```
+>  computed 计算属性(限制显示三个地址)
+
+```javascript
+// 本来是<li v-for="(item,index) in addressList">显示全部
+<li v-for="(item,index) in filterAddress">    
+
+data() {
+    return {
+        limitNum:3,   // 限制显示3条
+        addressList: []   // 地址数组
+    }
+},
+mounted() {
+    this.$nextTick(() => {
+        this.getAddressList()
+    })
+},
+computed: {
+    filterAddress() {    // 数组里面过滤，显示前三个
+        return this.addressList.slice(0, this.limitNum)   // 返回一个新的数组
+    }
+},
+methods: {
+    getAddressList() {
+        this.$http.get('http://localhost:8080/src/data/address.json').then((response) => {
+            var res = response.data;
+            if (res.status == "1") {
+                this.addressList = res.result;
+                console.log(this.addressList)
+            }
+        })
+    }
+}
+
+```
+>  点击类名切换
+
+<html>
+    <!--在这里插入内容-->
+    <p style="font-size:13px;"># li标签 <span style="color:#E45944;">默认地址的索引值(currentIndex)==当前li的索引(index)</span>时，添加check类名</p>
+    <p style="font-size:13px;"># li点击时，将当前li的index赋值给 currentIndex</p>
+</html>
+
+```javascript
+
+<li v-for="(item,index) in filterAddress" v-bind:class="{'check':index==currentIndex}" @click="currentIndex=index">
+
+data() {
+    return {
+        currentIndex: 0	// 默认选中地址索引
+    }
+},
+methods: {
+    setDefault(addressId) {   // 设置默认地址，设置默认同时把之前的默认地址取消
+        this.addressList.forEach((address, index) => {
+            if (address.addressId == addressId) {
+                address.isDefault = true;
+            } else {
+                address.isDefault = false;
+            }
+        })
+    }
+}
+
+```
 
 
 
