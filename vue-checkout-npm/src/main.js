@@ -17,7 +17,7 @@ import address from './components/address.vue'
 //配置路由
 const routes=[
     {path:'/cart', component:cart},
-    {path:'/adress', component:address},
+    {path:'/address', component:address},
     {path:'*', redirect:'/cart'}
 ];
 

@@ -101,7 +101,7 @@
 	                </div>
 	            </div>
 	            <!-- footer -->
-	            <!-- <div class="cart-foot-wrap">
+	            <div class="cart-foot-wrap">
 	                <div class="cart-foot-l">
 	                    <div class="item-all-check">
 	                        <a href="javascipt:;">
@@ -122,14 +122,15 @@
 	                        Item total: <span class="total-price">{{totalMoney | money("元")}}</span>
 	                    </div>
 	                    <div class="next-btn-wrap">
-	                        <a href="address.html" class="btn btn--red">结账</a>
+	                    	<router-link to="/address" class="btn btn--red">结账</router-link>
+	                        <!-- <a href="address.html" class="btn btn--red">结账</a> -->
 	                    </div>
 	                </div>
-	            </div> -->
+	            </div>
 	        </div>
 	    </div>
-
-	    <!-- <div class="md-modal modal-msg md-modal-transition" id="showModal" v-bind:class="{'md-show':delFlag}">
+		<!-- 弹窗 -->
+	    <div class="md-modal modal-msg md-modal-transition" id="showModal" v-bind:class="{'md-show':delFlag}">
 	        <div class="md-modal-inner">
 	            <div class="md-top">
 	                <button class="md-close" @click="delFlag=false">关闭</button>
@@ -145,35 +146,92 @@
 	            </div>
 	        </div>
 	    </div>
-	    <div class="md-overlay" id="showOverLay" v-if="delFlag" @click="delFlag=false"></div>	 -->
+	    <div class="md-overlay" id="showOverLay" v-if="delFlag" @click="delFlag=false"></div>
 	</div>
 </template>
 <script type="text/ecmascript-6">
+import Vue from 'vue'
 export default{
     data() {
     	return {
-        	productList:[]  // 产品数组
+        	productList:[],  // 产品数组
+        	checkAllFlag: false,  // 是否全选
+        	totalMoney:0,  // 总金额
+        	delFlag: false,   // 弹窗的显示
+        	curProduct:''
     	}
     },
     filters:{
-        formatMoney:function(value){
+        formatMoney(value) {
             return "￥ "+value.toFixed(2);
         }
     },
-    mounted:function(){   //vue1.0的ready:function(){}
+    mounted() {   //vue1.0的ready:function(){}
         this.$nextTick(function(){
             this.cartView();
         });
     },
-    methods:{
+    methods: {
     	cartView() {   // vue-resource插件获取json产品数据
     		this.$http.get('http://localhost:8080/src/data/cart.json', {"id":123}).then((res) => {
     			this.productList = res.body.result.productList;
     			console.log(this.productList)
     		});
+    	},
+    	changeMoney(product, way) {   // 商品加减数量
+    		if (way > 0) {
+    			product.productQuentity ++ ;
+    		} else {
+    			product.productQuentity -- ;
+    			if(product.productQuentity < 1){
+    				product.productQuentity = 1;
+    			}
+    		}
+    		this.calcTotalPrice();
+    	},
+    	selectedProduct(item) {  // 选中商品,json里面没有checked这个属性,所以set方法添加
+    		if (!item.checked) {
+    			this.$set(item, 'checked', true)  // 添加checked属性
+    		} else {
+    			item.checked = !item.checked;
+    		}
+    		this.calcTotalPrice();
+    	},
+    	checkAll(flag) {   // 全选，取消全选
+    		this.checkAllFlag = flag;
+    		var _this = this;
+    		this.productList.forEach((item) => {
+    			if(!item.checked){
+    				_this.$set(item, 'checked', _this.checkAllFlag);
+    			} else {
+    				item.checked = _this.checkAllFlag;
+    			}
+    		});
+    		this.calcTotalPrice();
+    	},
+    	calcTotalPrice() {  // 计算总金额
+    		var _this = this;
+			this.totalMoney = 0 ; // 防止累加,先清0
+    		this.productList.forEach((item) => {
+    			if (item.checked) {
+    				_this.totalMoney += item.productPrice*item.productQuentity
+    			}
+    		})
+    	},
+    	delConfirm(item) {  // 删除
+    		this.delFlag = true;
+    		this.curProduct = item;  // curProduct存储要删除的是哪一个
+    	},
+    	delProduct() {  // 确定删除Yes
+    		var index = this.productList.indexOf(this.curProduct);  //获取要删除的索引
+    		this.productList.splice(index, 1);  //从当前索引开始删除，删除一个
+    		this.delFlag = false;  // 关闭弹窗
     	}
     }	
 }
+Vue.filter('money', function(value, type){  // 全局过滤器
+	return value.toFixed(2) + type;
+})
 </script>
 <style scoped>   
 .quentity input{
