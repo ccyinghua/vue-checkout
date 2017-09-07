@@ -219,13 +219,9 @@ methods: {
 ```
 >  点击类名切换
 
-<html>
-    <!--在这里插入内容-->
-    <p style="font-size:13px;"># li标签 <span style="color:#E45944;">默认地址的索引值(currentIndex)==当前li的索引(index)</span>时，添加check类名</p>
-    <p style="font-size:13px;"># li点击时，将当前li的index赋值给 currentIndex</p>
-</html>
-
 ```javascript
+--> li标签 默认地址的索引值(currentIndex)==当前li的索引(index)时，添加check类名
+--> li点击时，将当前li的index赋值给 currentIndex
 
 <li v-for="(item,index) in filterAddress" v-bind:class="{'check':index==currentIndex}" @click="currentIndex=index">
 
