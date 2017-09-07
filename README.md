@@ -130,13 +130,10 @@ methods:{
 
 >  选中商品
 
-<html>
-<!--在这里插入内容-->
-<p style="font-size:13px;"># json里面没有checked这个属性,所以set方法添加</p>
-<p style="font-size:13px;"># <span style="color:#E45944;">this.$set</span>(局部)/<span style="color:#E45944;">Vue.set</span>(全局) 注册值 添加属性</p>
-</html>
-
 ```javascript
+--> json里面没有checked这个属性,所以set方法添加;
+--> this.$set(局部)/Vue.set</span>(全局) 注册值 添加属性
+
 selectedProduct:function(item){       
    if(typeof item.checked == "undefined"){
       //Vue.set(item,'checked',true);     // Vue.set也可以，但是本页面要import Vue...添加属性
