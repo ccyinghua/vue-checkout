@@ -132,7 +132,7 @@ methods:{
 
 ```javascript
 --> json里面没有checked这个属性,所以set方法添加;
---> this.$set(局部)/Vue.set</span>(全局) 注册值 添加属性
+--> this.$set(局部)/Vue.set(全局) 注册值 添加属性
 
 selectedProduct:function(item){       
    if(typeof item.checked == "undefined"){
